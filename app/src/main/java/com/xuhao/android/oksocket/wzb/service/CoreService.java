@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import com.xuhao.android.libsocket.sdk.bean.OriginalData;
 import com.xuhao.android.libsocket.sdk.connection.IConnectionManager;
 import com.xuhao.android.libsocket.sdk.connection.NoneReconnect;
 import com.xuhao.android.oksocket.MyApplication;
+import com.xuhao.android.oksocket.wzb.action.WeatherAction;
 import com.xuhao.android.oksocket.wzb.camera.CameraService;
 import com.xuhao.android.oksocket.wzb.receiver.LkAlarmReceiver;
 import com.xuhao.android.oksocket.wzb.receiver.ReConnectAlarmReceiver;
@@ -43,6 +45,7 @@ public class CoreService extends Service{
     private ConnectionInfo mInfo;
     public static  IConnectionManager mManager;
     private OkSocketOptions mOkOptions;
+
 
 
     private SocketActionAdapter adapter = new SocketActionAdapter() {
@@ -175,7 +178,8 @@ public class CoreService extends Service{
         switch (cmd){
             case "SOS1":
                 break;
-            case "CR":
+            case "CR"://test
+                WeatherAction.upload();
                 break;
             case "PHOTO":
                 startService(new Intent(MyApplication.CONTEXT, CameraService.class));

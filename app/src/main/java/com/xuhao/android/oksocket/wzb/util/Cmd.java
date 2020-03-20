@@ -26,7 +26,7 @@ public class Cmd {
     public static final String UPLOAD="UPLOAD";
     public static final String CR="CR";
     public static final String SPLIT="*";
-
+    public static final String WEATHER="WEATHER";
 
     public static final String IMEI=getImei();
 

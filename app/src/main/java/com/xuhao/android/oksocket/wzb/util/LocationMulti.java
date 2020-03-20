@@ -77,6 +77,38 @@ public class LocationMulti {
         return uniqueInstance;
     }
 
+
+    public String getLastLocation() {
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Log.e("wzb","location no permission");
+            return "V,0.0,0.0";
+
+        }
+        locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+
+        List<String> providers = locationManager.getProviders(true);
+
+        String provider=null;
+        if(providers.contains(LocationManager.GPS_PROVIDER)){
+            provider=LocationManager.GPS_PROVIDER;
+        }else if(providers.contains(LocationManager.NETWORK_PROVIDER)){
+            provider=LocationManager.NETWORK_PROVIDER;
+        }else{
+            provider=LocationManager.GPS_PROVIDER;
+        }
+        Location location = locationManager.getLastKnownLocation(provider);
+        Log.e("wzb","getLastKnownLocation location="+location);
+
+        return location!=null? "A,"+location.getLatitude()+","+location.getLongitude():"V,0.0,0.0";
+    }
+
     public void StartLocation(){
         LogUtil.logMessage("wzb","StartLocation +");
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -146,7 +178,26 @@ public class LocationMulti {
         return wifiList;
     }
 
-    private String getCellInfo(){
+    public String getWifiInfo(){
+        String wifiInfo="";
+        List<ScanResult> wifiList=getWifiList();
+        int wifiApNum=wifiList.size();
+
+        wifiInfo+=""+(wifiApNum>4?4:wifiApNum);
+        for(int i=0;i<(wifiApNum>4?4:wifiApNum);i++){
+            wifiInfo+=",";
+            wifiInfo+=wifiList.get(i).SSID;
+            wifiInfo+=",";
+            wifiInfo+=wifiList.get(i).BSSID;
+            wifiInfo+=",";
+            wifiInfo+=""+wifiList.get(i).level;
+        }
+
+        LogUtil.logMessage("wzb","wifiInfo="+wifiInfo);
+        return wifiInfo;
+    }
+
+    public String getCellInfo(){
         String cellInfo="";
         LogUtil.logMessage("wzb","getCellInfo +");
         TelephonyManager tm=(TelephonyManager) MyApplication.CONTEXT.getSystemService(Context.TELEPHONY_SERVICE);
@@ -157,29 +208,6 @@ public class LocationMulti {
             cellInfo+=stationNum;
             cellInfo+=",";
 
-            String gsmDelay="0";
-            cellInfo+=gsmDelay;
-            cellInfo+=",";
-
-            String mcc="460";
-            cellInfo+=mcc;
-            cellInfo+=",";
-
-            String mnc="0";
-            cellInfo+=mnc;
-            cellInfo+=",";
-
-            String lac="0";//基站位置区域码
-            cellInfo+=lac;
-            cellInfo+=",";
-
-            String cellid="0";//基站编号
-            cellInfo+=cellid;
-            cellInfo+=",";
-
-            String stationDbm="0";
-            cellInfo+=stationDbm;
-            cellInfo+=",";
 
         }else{
             String stationNum=""+(infoLists.size()>5? 5:infoLists.size());
@@ -364,21 +392,7 @@ public class LocationMulti {
     }
 
     private void uploadLbsWifiData(){
-        String wifiInfo="";
-        List<ScanResult> wifiList=getWifiList();
-        int wifiApNum=wifiList.size();
 
-        wifiInfo+=""+(wifiApNum>4?4:wifiApNum);
-        for(int i=0;i<(wifiApNum>4?4:wifiApNum);i++){
-            wifiInfo+=",";
-            wifiInfo+=wifiList.get(i).SSID;
-            wifiInfo+=",";
-            wifiInfo+=wifiList.get(i).BSSID;
-            wifiInfo+=",";
-            wifiInfo+=""+wifiList.get(i).level;
-        }
-
-        LogUtil.logMessage("wzb","wifiInfo="+wifiInfo);
         String info="";
 
         Calendar now=Calendar.getInstance();
@@ -455,7 +469,7 @@ public class LocationMulti {
         info+=getCellInfo();
 
 
-        info+=wifiInfo;
+        info+=getWifiInfo();
 
         LogUtil.logMessage("wzb","uploadLbsWifiData info="+info);
         final String udInfo=info;
