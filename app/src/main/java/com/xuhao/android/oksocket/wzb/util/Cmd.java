@@ -30,6 +30,9 @@ public class Cmd {
     public static final String AL="AL";
     public static final String SYSTEMTIME="SYSTEMTIME";
     public static final String HR="HR";
+    public static final String BP="BP";
+    public static final String ECG="ECG";
+    public static final String SLEEP="SLEEP";
 
     public static final String IMEI=getImei();
 
