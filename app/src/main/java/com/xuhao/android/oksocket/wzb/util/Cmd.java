@@ -20,6 +20,8 @@ import com.xuhao.android.oksocket.wzb.service.CoreService;
 
 public class Cmd {
 
+
+    public static final int DATA_CMD_HEADER_LEN=2+1+15+1;
     public static final String LK="LK";
     public static final String CS="CS";
     public static final String UD="UD";
@@ -33,6 +35,7 @@ public class Cmd {
     public static final String BP="BP";
     public static final String ECG="ECG";
     public static final String SLEEP="SLEEP";
+    public static final String PHOTO="PHOTO";
 
     public static final String IMEI=getImei();
 

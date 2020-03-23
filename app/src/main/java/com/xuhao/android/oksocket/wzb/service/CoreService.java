@@ -185,28 +185,36 @@ public class CoreService extends Service{
     };
 
     private void parseData(String msg){
-        List<String> msgArr= Arrays.asList(msg.split("\\*"));
+        List<String> msgArr= Arrays.asList(msg.split("\\*|,"));
         String imei=msgArr.get(1);
         String cmd=msgArr.get(2);
        // String info=msgArr.get(3).substring(cmd.length()+1);
         String info="";
+        info=msg.substring(Cmd.DATA_CMD_HEADER_LEN+cmd.length()+1);
         Log.e("wzb","parseData imei="+imei+",cmd="+cmd+",info="+info);
         String rspMsg="";
         switch (cmd){
             case "SOS1":
                 break;
-            case "CR"://test
+            case Cmd.CR://test
                 HrAction.upload();
                 break;
-            case "PHOTO":
+            case Cmd.PHOTO:
                 startService(new Intent(MyApplication.CONTEXT, CameraService.class));
                 break;
-            case "UPLOAD":
-                MyApplication.sp.set("upload",info);
-                rspMsg= Cmd.CS+Cmd.SPLIT+imei+Cmd.SPLIT+"UPLOAD";
-                Cmd.send(rspMsg);
+            case Cmd.UPLOAD:
+                if(msgArr.size()>3) {
+                    int udInterval = Integer.parseInt(msgArr.get(3));
+                    if(udInterval>=10 && udInterval<12*3600) {
+                        MyApplication.sp.set("upload", udInterval);
+                        rspMsg = Cmd.CS + Cmd.SPLIT + imei + Cmd.SPLIT + "UPLOAD";
+                        Cmd.send(rspMsg);
+                        Intent i = new Intent(MyApplication.CONTEXT, UdLongRunningService.class);
+                        MyApplication.CONTEXT.startService(i);
+                    }
+                }
                 break;
-            case "HR":
+            case Cmd.HR:
                 mCoreServiceHandler.removeCallbacks(HrAction.hrTimeOut);
                 break;
             default:

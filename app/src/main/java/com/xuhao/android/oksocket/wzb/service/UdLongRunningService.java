@@ -35,7 +35,7 @@ import java.util.List;
 
 public class UdLongRunningService extends Service {
 
-    public static final int UD_INTERVAL=20*1000;//60 seconds
+    public static final int UD_INTERVAL=20;//20 seconds//20*1000;//60 seconds
 
     private LocationManager mLocationManager;
     private Context mContext;
@@ -112,7 +112,9 @@ public class UdLongRunningService extends Service {
         LocationMulti.getInstance(MyApplication.CONTEXT).StartLocation();
 
         AlarmManager manager=(AlarmManager)getSystemService(ALARM_SERVICE);
-        long triggerAtTime= SystemClock.elapsedRealtime() + UD_INTERVAL;
+        int dynamicUDInterval=MyApplication.sp.get("upload",UD_INTERVAL);
+        LogUtil.logMessage("wzb","dynamicUDInterval="+dynamicUDInterval);
+        long triggerAtTime= SystemClock.elapsedRealtime() + dynamicUDInterval*1000;
         Intent i = new Intent(this, UdAlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
         manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
