@@ -203,45 +203,52 @@ public class LocationMulti {
         TelephonyManager tm=(TelephonyManager) MyApplication.CONTEXT.getSystemService(Context.TELEPHONY_SERVICE);
         List<CellInfo> infoLists=tm.getAllCellInfo();
 
-        if(infoLists.size()<1){
-            String stationNum="0";
-            cellInfo+=stationNum;
-            cellInfo+=",";
+        try {
+            if (infoLists.size() < 1) {
+                String stationNum = "0";
+                cellInfo += stationNum;
+                cellInfo += ",";
 
 
-        }else{
-            String stationNum=""+(infoLists.size()>5? 5:infoLists.size());
-            cellInfo+=stationNum;
-            cellInfo+=",";
+            } else {
+                String stationNum = "" + (infoLists.size() > 5 ? 5 : infoLists.size());
+                cellInfo += stationNum;
+                cellInfo += ",";
 
-            String gsmDelay="1";
-            cellInfo+=gsmDelay;
-            cellInfo+=",";
+                String gsmDelay = "1";
+                cellInfo += gsmDelay;
+                cellInfo += ",";
 
-            String mcc="460";
-            cellInfo+=mcc;
-            cellInfo+=",";
+                String mcc = "460";
+                cellInfo += mcc;
+                cellInfo += ",";
 
-            CellInfoGsm cg=(CellInfoGsm)infoLists.get(0);
-            String mnc=""+cg.getCellIdentity().getMnc();
+                CellInfoGsm cg = (CellInfoGsm) infoLists.get(0);
+                String mnc = "" + cg.getCellIdentity().getMnc();
 
-            cellInfo+=mnc;
-            cellInfo+=",";
-            for(int i=0;i<(infoLists.size()>5? 5:infoLists.size());i++){
-                CellInfoGsm cg2=(CellInfoGsm)infoLists.get(i);
-                String lac=""+cg2.getCellIdentity().getLac();//基站位置区域码
-                cellInfo+=lac;
-                cellInfo+=",";
+                cellInfo += mnc;
+                cellInfo += ",";
+                for (int i = 0; i < (infoLists.size() > 5 ? 5 : infoLists.size()); i++) {
+                    CellInfoGsm cg2 = (CellInfoGsm) infoLists.get(i);
+                    String lac = "" + cg2.getCellIdentity().getLac();//基站位置区域码
+                    cellInfo += lac;
+                    cellInfo += ",";
 
-                String cellid=""+cg2.getCellIdentity().getCid();//基站编号
-                cellInfo+=cellid;
-                cellInfo+=",";
+                    String cellid = "" + cg2.getCellIdentity().getCid();//基站编号
+                    cellInfo += cellid;
+                    cellInfo += ",";
 
-                String stationDbm=""+cg2.getCellSignalStrength().getDbm();
-                cellInfo+=stationDbm;
-                cellInfo+=",";
+                    String stationDbm = "" + cg2.getCellSignalStrength().getDbm();
+                    cellInfo += stationDbm;
+                    cellInfo += ",";
 
+                }
             }
+        }catch(Exception e){
+            LogUtil.logMessage("wzb","getCellInfo exception e:"+e.toString());
+            cellInfo += 0;
+            cellInfo += ",";
+
         }
 
         LogUtil.logMessage("wzb","cellInfo="+cellInfo);
@@ -257,7 +264,7 @@ public class LocationMulti {
         }
     };
 
-    Handler mHandler=new Handler(){
+    public Handler mHandler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);

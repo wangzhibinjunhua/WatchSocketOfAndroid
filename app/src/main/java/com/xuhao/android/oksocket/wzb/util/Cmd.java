@@ -27,6 +27,9 @@ public class Cmd {
     public static final String CR="CR";
     public static final String SPLIT="*";
     public static final String WEATHER="WEATHER";
+    public static final String AL="AL";
+    public static final String SYSTEMTIME="SYSTEMTIME";
+    public static final String HR="HR";
 
     public static final String IMEI=getImei();
 

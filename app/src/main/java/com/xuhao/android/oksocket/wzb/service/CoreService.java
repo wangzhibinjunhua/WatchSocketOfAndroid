@@ -6,7 +6,9 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -22,6 +24,7 @@ import com.xuhao.android.libsocket.sdk.bean.OriginalData;
 import com.xuhao.android.libsocket.sdk.connection.IConnectionManager;
 import com.xuhao.android.libsocket.sdk.connection.NoneReconnect;
 import com.xuhao.android.oksocket.MyApplication;
+import com.xuhao.android.oksocket.wzb.action.HrAction;
 import com.xuhao.android.oksocket.wzb.action.WeatherAction;
 import com.xuhao.android.oksocket.wzb.camera.CameraService;
 import com.xuhao.android.oksocket.wzb.receiver.LkAlarmReceiver;
@@ -167,6 +170,20 @@ public class CoreService extends Service{
         sendBroadcast(new Intent("com.android.custom.oksocket_reboot"));
     }
 
+    public static Handler mCoreServiceHandler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 1000://test
+                    LogUtil.logMessage("wzb","mCoreServiceHandler test");
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
     private void parseData(String msg){
         List<String> msgArr= Arrays.asList(msg.split("\\*"));
         String imei=msgArr.get(1);
@@ -179,7 +196,7 @@ public class CoreService extends Service{
             case "SOS1":
                 break;
             case "CR"://test
-                WeatherAction.upload();
+                HrAction.upload();
                 break;
             case "PHOTO":
                 startService(new Intent(MyApplication.CONTEXT, CameraService.class));
@@ -188,6 +205,9 @@ public class CoreService extends Service{
                 MyApplication.sp.set("upload",info);
                 rspMsg= Cmd.CS+Cmd.SPLIT+imei+Cmd.SPLIT+"UPLOAD";
                 Cmd.send(rspMsg);
+                break;
+            case "HR":
+                mCoreServiceHandler.removeCallbacks(HrAction.hrTimeOut);
                 break;
             default:
                 break;
