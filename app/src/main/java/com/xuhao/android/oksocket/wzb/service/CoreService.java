@@ -24,6 +24,7 @@ import com.xuhao.android.libsocket.sdk.bean.OriginalData;
 import com.xuhao.android.libsocket.sdk.connection.IConnectionManager;
 import com.xuhao.android.libsocket.sdk.connection.NoneReconnect;
 import com.xuhao.android.oksocket.MyApplication;
+import com.xuhao.android.oksocket.wzb.action.FindAction;
 import com.xuhao.android.oksocket.wzb.action.HrAction;
 import com.xuhao.android.oksocket.wzb.action.VernoAction;
 import com.xuhao.android.oksocket.wzb.action.WeatherAction;
@@ -199,7 +200,7 @@ public class CoreService extends Service{
                 break;
             case Cmd.CR://test
                 //HrAction.upload();
-                VernoAction.execute(mContext);
+                FindAction.execute(mContext);
                 break;
             case Cmd.PHOTO:
                 startService(new Intent(MyApplication.CONTEXT, CameraService.class));

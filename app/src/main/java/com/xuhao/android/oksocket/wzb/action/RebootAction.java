@@ -13,24 +13,24 @@ import java.util.Date;
 
 /**
 *
-* @Author: ZhiBin.Wang
+* @Author: Zhibin.Wang
 * @Email: wangzhibin_x@qq.com
-* @Time: 2020/3/24 15:43
+* @Time: 2020/3/24 16:40
 */
-public class FactoryAction {
+public class RebootAction {
 
         public static void execute(Context context){
-                //notify system factoryreset
+                //notify system reboot
             upload();
-            context.sendBroadcast(new Intent("com.wzb.custom.factory_reset"));
+            context.sendBroadcast(new Intent("com.wzb.custom.reboot"));
         }
 
-    private static void upload(){
+    private static void upload() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                LogUtil.logMessage("wzb","FactoryAction upload executed at "+new Date().toString());
-                String msg= Cmd.encode(Cmd.CS+Cmd.SPLIT+Cmd.IMEI+Cmd.SPLIT+Cmd.FACTORY);
+                LogUtil.logMessage("wzb", "RebootAction upload executed at " + new Date().toString());
+                String msg = Cmd.encode(Cmd.CS + Cmd.SPLIT + Cmd.IMEI + Cmd.SPLIT + Cmd.RESET);
                 CoreService.mManager.send(new MsgDataBean(msg));
             }
         }).start();

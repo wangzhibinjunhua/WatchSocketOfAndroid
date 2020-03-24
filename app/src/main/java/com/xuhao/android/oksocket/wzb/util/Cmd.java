@@ -18,9 +18,9 @@ import java.lang.reflect.Method;
 
 /**
 *
-* @Author: ZhiBin.Wang
+* @Author: Zhibin.Wang
 * @Email: wangzhibin_x@qq.com
-* @Time: 2020/3/24 15:43
+* @Time: 2020/3/24 16:39
 */
 
 public class Cmd {
@@ -45,6 +45,10 @@ public class Cmd {
     public static final String SOS="SOS";
     public static final String FACTORY="FACTORY";
     public static final String VERNO="VERNO";
+    public static final String RESET="RESET";
+    public static final String FIND="FIND";
+
+
 
     public static final String IMEI=getImei();
 
