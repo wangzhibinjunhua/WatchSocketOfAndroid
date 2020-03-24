@@ -7,7 +7,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-
+/**
+*
+* @Author: ZhiBin.Wang
+* @Email: wangzhibin_x@qq.com
+* @Time: 2020/3/24 15:43
+*/
 
 public class CallAction {
    public static void execute(Context context, String phoneNumber){

@@ -17,8 +17,11 @@ import com.xuhao.android.oksocket.wzb.service.CoreService;
 import java.lang.reflect.Method;
 
 /**
- * Created by Administrator on 2018-07-11.
- */
+*
+* @Author: ZhiBin.Wang
+* @Email: wangzhibin_x@qq.com
+* @Time: 2020/3/24 15:43
+*/
 
 public class Cmd {
 
