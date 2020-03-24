@@ -14,6 +14,8 @@ import com.xuhao.android.oksocket.MyApplication;
 import com.xuhao.android.oksocket.data.MsgDataBean;
 import com.xuhao.android.oksocket.wzb.service.CoreService;
 
+import java.lang.reflect.Method;
+
 /**
  * Created by Administrator on 2018-07-11.
  */
@@ -36,6 +38,10 @@ public class Cmd {
     public static final String ECG="ECG";
     public static final String SLEEP="SLEEP";
     public static final String PHOTO="PHOTO";
+    public static final String CALL="CALL";
+    public static final String SOS="SOS";
+    public static final String FACTORY="FACTORY";
+    public static final String VERNO="VERNO";
 
     public static final String IMEI=getImei();
 
@@ -87,4 +93,31 @@ public class Cmd {
     public static void send(String msg){
         CoreService.mManager.send(new MsgDataBean(encode(msg)));
     }
+
+    public static String getProperty(String key, String defaultValue) {
+        String value = defaultValue;
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class, String.class);
+            value = (String)(get.invoke(c, key, defaultValue));
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.logMessage("wzb","getProperty Exception="+e.toString());
+        }finally {
+            return value;
+        }
+    }
+
+    public static void setProperty(String key, String value) {
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            Method set = c.getMethod("set", String.class, String.class);
+            set.invoke(c, key, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.logMessage("wzb","setProperty Exception="+e.toString());
+        }
+    }
+
+
 }

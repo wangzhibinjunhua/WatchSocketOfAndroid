@@ -25,6 +25,7 @@ import com.xuhao.android.libsocket.sdk.connection.IConnectionManager;
 import com.xuhao.android.libsocket.sdk.connection.NoneReconnect;
 import com.xuhao.android.oksocket.MyApplication;
 import com.xuhao.android.oksocket.wzb.action.HrAction;
+import com.xuhao.android.oksocket.wzb.action.VernoAction;
 import com.xuhao.android.oksocket.wzb.action.WeatherAction;
 import com.xuhao.android.oksocket.wzb.camera.CameraService;
 import com.xuhao.android.oksocket.wzb.receiver.LkAlarmReceiver;
@@ -48,6 +49,7 @@ public class CoreService extends Service{
     private ConnectionInfo mInfo;
     public static  IConnectionManager mManager;
     private OkSocketOptions mOkOptions;
+    private Context mContext;
 
 
 
@@ -55,9 +57,7 @@ public class CoreService extends Service{
 
         @Override
         public void onSocketConnectionSuccess(Context context, ConnectionInfo info, String action) {
-            Log.e("wzb","onSocketConnectionSuccess 连接成功");
-            //String msg=Cmd.encode(Cmd.IMEI+Cmd.SPLIT+Cmd.LK);
-            //mManager.send(new MsgDataBean(msg));
+            Log.e("wzb","onSocketConnectionSuccess ");
             context.startService(new Intent(context,LkLongRunningService.class));
             context.startService(new Intent(context,UdLongRunningService.class));
         }
@@ -65,17 +65,17 @@ public class CoreService extends Service{
         @Override
         public void onSocketDisconnection(Context context, ConnectionInfo info, String action, Exception e) {
             if (e != null) {
-                Log.e("wzb","onSocketDisconnection 异常断开"+e.getMessage());
+                Log.e("wzb","onSocketDisconnection exception"+e.getMessage());
             } else {
-                Log.e("wzb","onSocketDisconnection 正常断开");
+                Log.e("wzb","onSocketDisconnection normal");
             }
             sendReConnect();
         }
 
         @Override
         public void onSocketConnectionFailed(Context context, ConnectionInfo info, String action, Exception e) {
-            Toast.makeText(context, "连接失败" + e.getMessage(), LENGTH_SHORT).show();
-            Log.e("wzb","onSocketConnectionFailed 连接失败");
+            Toast.makeText(context, "onSocketConnectionFailed" + e.getMessage(), LENGTH_SHORT).show();
+            Log.e("wzb","onSocketConnectionFailed ");
             sendReConnect();
         }
 
@@ -86,7 +86,7 @@ public class CoreService extends Service{
             //logRece(str);
             Log.e("wzb","CoreService/onSocketReadResponse rece:"+str);
             parseData(str);
-            Log.e("wzb","1111111");
+            Log.e("wzb","parseData end");
         }
 
         @Override
@@ -153,6 +153,7 @@ public class CoreService extends Service{
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext=this;
     }
 
     @Override
@@ -190,14 +191,15 @@ public class CoreService extends Service{
         String cmd=msgArr.get(2);
        // String info=msgArr.get(3).substring(cmd.length()+1);
         String info="";
-        info=msg.substring(Cmd.DATA_CMD_HEADER_LEN+cmd.length()+1);
+       if(msgArr.size()>3) info=msg.substring(Cmd.DATA_CMD_HEADER_LEN+cmd.length()+1);
         Log.e("wzb","parseData imei="+imei+",cmd="+cmd+",info="+info);
         String rspMsg="";
         switch (cmd){
             case "SOS1":
                 break;
             case Cmd.CR://test
-                HrAction.upload();
+                //HrAction.upload();
+                VernoAction.execute(mContext);
                 break;
             case Cmd.PHOTO:
                 startService(new Intent(MyApplication.CONTEXT, CameraService.class));

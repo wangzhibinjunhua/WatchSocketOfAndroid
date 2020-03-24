@@ -7,6 +7,7 @@ import com.xuhao.android.oksocket.data.MsgDataBean;
 import com.xuhao.android.oksocket.wzb.service.CoreService;
 import com.xuhao.android.oksocket.wzb.util.Cmd;
 import com.xuhao.android.oksocket.wzb.util.LocationMulti;
+import com.xuhao.android.oksocket.wzb.util.LogUtil;
 
 import java.util.Date;
 
@@ -16,7 +17,7 @@ public class AlertAction {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.e("wzb","AlertAction upload executed at "+new Date().toString());
+                LogUtil.logMessage("wzb","AlertAction upload executed at "+new Date().toString());
                 String msg= Cmd.encode(Cmd.CS+Cmd.SPLIT+Cmd.IMEI+Cmd.SPLIT+Cmd.AL+","+packALInfo());
                 CoreService.mManager.send(new MsgDataBean(msg));
             }
