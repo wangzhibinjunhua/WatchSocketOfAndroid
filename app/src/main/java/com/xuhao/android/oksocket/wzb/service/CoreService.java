@@ -26,6 +26,7 @@ import com.xuhao.android.libsocket.sdk.connection.NoneReconnect;
 import com.xuhao.android.oksocket.MyApplication;
 import com.xuhao.android.oksocket.wzb.action.FindAction;
 import com.xuhao.android.oksocket.wzb.action.HrAction;
+import com.xuhao.android.oksocket.wzb.action.IpAction;
 import com.xuhao.android.oksocket.wzb.action.VernoAction;
 import com.xuhao.android.oksocket.wzb.action.WeatherAction;
 import com.xuhao.android.oksocket.wzb.camera.CameraService;
@@ -108,7 +109,9 @@ public class CoreService extends Service{
 
 
     private void initSocket(){
-        mInfo = new ConnectionInfo("192.168.1.134", 8282);
+        String ipAddr=MyApplication.sp.get("ip_addr",Cmd.IP_ADDR_DEFAULT);
+        String ipPort=MyApplication.sp.get("ip_port",Cmd.IP_PORT_DEFAULT);
+        mInfo = new ConnectionInfo(ipAddr, Integer.parseInt(ipPort));
         mOkOptions = new OkSocketOptions.Builder()
                 .setReconnectionManager(new NoneReconnect())
                 .setWritePackageBytes(1024)
@@ -143,6 +146,11 @@ public class CoreService extends Service{
     public static void disconnect(){
         if(mManager == null) return;
         if(mManager.isConnect())mManager.disconnect();
+    }
+
+    private void reconnectNewIp(){
+        releaseSocket();
+        initSocket();
     }
 
     @Nullable
@@ -180,6 +188,7 @@ public class CoreService extends Service{
                 case 1000://test
                     LogUtil.logMessage("wzb","mCoreServiceHandler test");
                     break;
+
                 default:
                     break;
             }
@@ -219,6 +228,11 @@ public class CoreService extends Service{
                 break;
             case Cmd.HR:
                 mCoreServiceHandler.removeCallbacks(HrAction.hrTimeOut);
+                break;
+            case Cmd.IP:
+                if(IpAction.execute(mContext,info)==0){
+                    reconnectNewIp();
+                }
                 break;
             default:
                 break;

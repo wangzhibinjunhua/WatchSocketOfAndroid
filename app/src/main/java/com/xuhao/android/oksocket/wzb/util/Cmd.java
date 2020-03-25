@@ -25,6 +25,8 @@ import java.lang.reflect.Method;
 
 public class Cmd {
 
+    public static final String IP_ADDR_DEFAULT="192.168.1.134";
+    public static final String IP_PORT_DEFAULT="8282";
 
     public static final int DATA_CMD_HEADER_LEN=2+1+15+1;
     public static final String LK="LK";
@@ -47,18 +49,24 @@ public class Cmd {
     public static final String VERNO="VERNO";
     public static final String RESET="RESET";
     public static final String FIND="FIND";
-
+    public static final String POWEROFF="POWEROFF";
+    public static final String REMIND="REMIND";
+    public static final String PHB="PHB";
+    public static final String PHB2="PHB2";
+    public static final String TK="TK";
+    public static final String SILENCETIME="SILENCETIME";
+    public static final String VOLUME="VOLUME";
+    public static final String BRIGHTNESS="BRIGHTNESS";
+    public static final String CXYELL="CXYELL";
+    public static final String PEDO="PEDO";
+    public static final String PING="PING";
+    public static final String MESSAGE="MESSAGE";
+    public static final String IP="IP";
+    public static final String LANGUAGE="LANGUAGE";
+    public static final String ALERT="ALERT";
 
 
     public static final String IMEI=getImei();
-
-
-
-
-
-
-
-
 
     public static String encode(String data){
         return String.format("%04x",data.length())+data;
@@ -124,6 +132,14 @@ public class Cmd {
             e.printStackTrace();
             LogUtil.logMessage("wzb","setProperty Exception="+e.toString());
         }
+    }
+
+    public static boolean checkAddress(String s) {
+        return s.matches("((25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))");
+    }
+
+    public static boolean checkPort(String s) {
+        return s.matches("^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)");
     }
 
 
