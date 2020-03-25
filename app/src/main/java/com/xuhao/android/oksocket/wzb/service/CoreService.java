@@ -23,6 +23,8 @@ import com.xuhao.android.libsocket.sdk.bean.ISendable;
 import com.xuhao.android.libsocket.sdk.bean.OriginalData;
 import com.xuhao.android.libsocket.sdk.connection.IConnectionManager;
 import com.xuhao.android.libsocket.sdk.connection.NoneReconnect;
+import com.xuhao.android.libsocket.sdk.protocol.IHeaderProtocol;
+import com.xuhao.android.libsocket.utils.BytesUtils;
 import com.xuhao.android.oksocket.MyApplication;
 import com.xuhao.android.oksocket.wzb.action.FindAction;
 import com.xuhao.android.oksocket.wzb.action.HrAction;
@@ -35,6 +37,7 @@ import com.xuhao.android.oksocket.wzb.receiver.ReConnectAlarmReceiver;
 import com.xuhao.android.oksocket.wzb.util.Cmd;
 import com.xuhao.android.oksocket.wzb.util.LogUtil;
 
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
@@ -107,6 +110,22 @@ public class CoreService extends Service{
         }
     };
 
+    IHeaderProtocol mIHeaderProtocol=new IHeaderProtocol(){
+
+        @Override
+        public int getHeaderLength() {
+            return 4;
+        }
+
+        @Override
+        public int getBodyLength(byte[] header, ByteOrder byteOrder) {
+            String hexHeaderStr= BytesUtils.convertHexToString(BytesUtils.bytesToHexString(header));
+            return Integer.valueOf(hexHeaderStr,16);
+
+
+        }
+    };
+
 
     private void initSocket(){
         String ipAddr=MyApplication.sp.get("ip_addr",Cmd.IP_ADDR_DEFAULT);
@@ -115,6 +134,8 @@ public class CoreService extends Service{
         mOkOptions = new OkSocketOptions.Builder()
                 .setReconnectionManager(new NoneReconnect())
                 .setWritePackageBytes(1024)
+                .setMaxReadDataMB(5)
+                .setHeaderProtocol(mIHeaderProtocol)
                 .build();
         mManager = open(mInfo).option(mOkOptions);
         Log.e("wzb","initSocket mManager="+mManager);
