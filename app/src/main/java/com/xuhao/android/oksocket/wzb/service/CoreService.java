@@ -110,18 +110,41 @@ public class CoreService extends Service{
         }
     };
 
-    IHeaderProtocol mIHeaderProtocol=new IHeaderProtocol(){
-
+    IHeaderProtocol mIHeaderProtocolA=new IHeaderProtocol(){
+        //协议A 包长+内容
         @Override
         public int getHeaderLength() {
+
             return 4;
         }
 
         @Override
         public int getBodyLength(byte[] header, ByteOrder byteOrder) {
+
             String hexHeaderStr= BytesUtils.convertHexToString(BytesUtils.bytesToHexString(header));
             return Integer.valueOf(hexHeaderStr,16);
 
+
+        }
+    };
+
+    IHeaderProtocol mIHeaderProtocolB=new IHeaderProtocol(){
+        //协议B 包头有其他内容，开始标识aa+包长， 包尾有结束标识aa.仅举例，aa可换其他字符
+        @Override
+        public int getHeaderLength() {
+            return 6;
+
+        }
+
+        @Override
+        public int getBodyLength(byte[] header, ByteOrder byteOrder) {
+            String headerStr=new String(header);
+            if(!"aa".equals(headerStr.substring(0,2))){
+                return 0; //如果包头标识不符合，返回0即可丢弃此次错误数据
+             }
+            LogUtil.logMessage("wzb","headerStr="+headerStr);
+
+            return Integer.valueOf(headerStr.substring(2),16)+2;
 
         }
     };
@@ -135,7 +158,7 @@ public class CoreService extends Service{
                 .setReconnectionManager(new NoneReconnect())
                 .setWritePackageBytes(1024)
                 .setMaxReadDataMB(5)
-                .setHeaderProtocol(mIHeaderProtocol)
+                .setHeaderProtocol(mIHeaderProtocolA)
                 .build();
         mManager = open(mInfo).option(mOkOptions);
         Log.e("wzb","initSocket mManager="+mManager);
