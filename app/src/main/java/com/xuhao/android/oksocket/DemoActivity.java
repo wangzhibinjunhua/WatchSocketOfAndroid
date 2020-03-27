@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.xuhao.android.oksocket.wzb.action.PhbAction;
 import com.xuhao.android.oksocket.wzb.camera.CameraService;
 import com.xuhao.android.oksocket.wzb.service.LkLongRunningService;
 import com.xuhao.android.oksocket.wzb.service.UdLongRunningService;
@@ -59,6 +60,8 @@ public class DemoActivity extends AppCompatActivity {
         //startService(new Intent(this, LkLongRunningService.class));
        // startService(new Intent(this, CameraService.class));
         //UdLongRunningService.packUdInfo("A,-23.22,11.11");
+       // String testStr="34123456,feff72387238,22344,feff8bbe5907,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,";
+       // PhbAction.savePhb(testStr);
     }
 
     private void initPermission(){
@@ -69,6 +72,9 @@ public class DemoActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.CAMERA,
                 Manifest.permission.WAKE_LOCK,
+                Manifest.permission.WRITE_CONTACTS,
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.CHANGE_WIFI_STATE,
                 Manifest.permission.SYSTEM_ALERT_WINDOW,
                         Manifest.permission.READ_PHONE_STATE}
                 , new PermissionUtils.OnPermissionListener() {

@@ -1,20 +1,38 @@
 package com.xuhao.android.oksocket.wzb.util;
 
 import android.Manifest;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.xuhao.android.oksocket.MyApplication;
+import com.xuhao.android.oksocket.R;
 import com.xuhao.android.oksocket.data.MsgDataBean;
 import com.xuhao.android.oksocket.wzb.service.CoreService;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Method;
+import java.util.List;
+
+import android.provider.ContactsContract.RawContacts;
+import android.provider.ContactsContract.Data;
+
+import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 
 /**
 *
@@ -141,6 +159,64 @@ public class Cmd {
     public static boolean checkPort(String s) {
         return s.matches("^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)");
     }
+
+
+    // unicode feff开头 不含.  举例：feff72387238 就是爸爸
+    public static String unicodeToStr(String unicode) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i+4 <= unicode.length(); i+=4) {
+            String info=unicode.substring(i,i+4);
+
+            int index = Integer.parseInt(info, 16);
+            sb.append((char) index);
+        }
+        return sb.toString();
+    }
+
+
+    public static void addContact(Context context,String name, String phoneNumber) {
+        // 创建一个空的ContentValues
+        ContentValues values = new ContentValues();
+
+        // 向RawContacts.CONTENT_URI空值插入，
+        // 先获取Android系统返回的rawContactId
+        // 后面要基于此id插入值
+        Uri rawContactUri = context.getContentResolver().insert(ContactsContract.RawContacts.CONTENT_URI, values);
+        long rawContactId = ContentUris.parseId(rawContactUri);
+        values.clear();
+
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        // 内容类型
+        values.put(Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
+        // 联系人名字
+        values.put(StructuredName.GIVEN_NAME, name);
+        // 向联系人URI添加联系人名字
+        context.getContentResolver().insert(Data.CONTENT_URI, values);
+        values.clear();
+
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+        // 联系人的电话号码
+        values.put(Phone.NUMBER, phoneNumber);
+        // 电话类型
+        values.put(Phone.TYPE, Phone.TYPE_MOBILE);
+        // 向联系人电话号码URI添加电话号码
+        context.getContentResolver().insert(Data.CONTENT_URI, values);
+        values.clear();
+
+        //values.put(Data.RAW_CONTACT_ID, rawContactId);
+        //values.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+        // 联系人的Email地址
+        //values.put(Email.DATA, "zhangphil@xxx.com");
+        // 电子邮件的类型
+       // values.put(Email.TYPE, Email.TYPE_WORK);
+        // 向联系人Email URI添加Email数据
+       // context.getContentResolver().insert(Data.CONTENT_URI, values);
+
+    }
+
+
 
 
 }

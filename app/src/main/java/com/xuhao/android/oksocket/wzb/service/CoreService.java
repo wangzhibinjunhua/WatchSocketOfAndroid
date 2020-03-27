@@ -241,6 +241,7 @@ public class CoreService extends Service{
 
     private void parseData(String msg){
         List<String> msgArr= Arrays.asList(msg.split("\\*|,"));
+
         String imei=msgArr.get(1);
         String cmd=msgArr.get(2);
        // String info=msgArr.get(3).substring(cmd.length()+1);
