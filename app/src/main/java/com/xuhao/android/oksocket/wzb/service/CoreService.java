@@ -26,6 +26,7 @@ import com.xuhao.android.libsocket.sdk.connection.NoneReconnect;
 import com.xuhao.android.libsocket.sdk.protocol.IHeaderProtocol;
 import com.xuhao.android.libsocket.utils.BytesUtils;
 import com.xuhao.android.oksocket.MyApplication;
+import com.xuhao.android.oksocket.wzb.action.AlertAction;
 import com.xuhao.android.oksocket.wzb.action.FindAction;
 import com.xuhao.android.oksocket.wzb.action.HrAction;
 import com.xuhao.android.oksocket.wzb.action.IpAction;
@@ -254,7 +255,8 @@ public class CoreService extends Service{
                 break;
             case Cmd.CR://test
                 //HrAction.upload();
-                FindAction.execute(mContext);
+               // FindAction.execute(mContext);
+                AlertAction.execute(mContext,"warning test!");
                 break;
             case Cmd.PHOTO:
                 startService(new Intent(MyApplication.CONTEXT, CameraService.class));

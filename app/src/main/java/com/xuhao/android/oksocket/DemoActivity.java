@@ -1,8 +1,12 @@
 package com.xuhao.android.oksocket;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,6 +15,7 @@ import android.widget.Button;
 
 import com.xuhao.android.oksocket.wzb.action.PhbAction;
 import com.xuhao.android.oksocket.wzb.camera.CameraService;
+import com.xuhao.android.oksocket.wzb.camera.CameraWindow;
 import com.xuhao.android.oksocket.wzb.service.LkLongRunningService;
 import com.xuhao.android.oksocket.wzb.service.UdLongRunningService;
 import com.xuhao.android.oksocket.wzb.util.Cmd;
@@ -50,7 +55,18 @@ public class DemoActivity extends AppCompatActivity {
             }
         });
         initPermission();
+        dialogOpenPower();
+        CameraWindow.show(MyApplication.CONTEXT);
         test();
+    }
+
+    public void dialogOpenPower(){
+        if(Build.VERSION.SDK_INT >= 23)
+            if (! Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent,10);
+            }
     }
 
     void test(){
