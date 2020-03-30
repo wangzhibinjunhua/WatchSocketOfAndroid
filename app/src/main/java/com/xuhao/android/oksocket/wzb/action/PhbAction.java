@@ -44,10 +44,10 @@ public class PhbAction {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                List<String> msgArr= Arrays.asList(phb.split(","));
+                List<String> msgArr= Arrays.asList(phb.split(",",-1));
                 LogUtil.logMessage("wzb","phb size:"+msgArr.size());
-               // if(msgArr.size()==50){ //valid phb number 25
-                if(true){
+                if(msgArr.size()==50){ //valid phb number 25
+
                     Uri uri = Uri.parse("content://com.android.contacts/raw_contacts");
                     MyApplication.CONTEXT.getContentResolver().delete(uri,"_id!=-1", null);
                     for(int i=0;i<msgArr.size();i+=2){

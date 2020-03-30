@@ -47,6 +47,7 @@ public class Cmd {
     public static final String IP_PORT_DEFAULT="8282";
 
     public static final int DATA_CMD_HEADER_LEN=2+1+15+1;
+
     public static final String LK="LK";
     public static final String CS="CS";
     public static final String UD="UD";

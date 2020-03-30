@@ -241,7 +241,7 @@ public class CoreService extends Service{
     };
 
     private void parseData(String msg){
-        List<String> msgArr= Arrays.asList(msg.split("\\*|,"));
+        List<String> msgArr= Arrays.asList(msg.split("\\*|,",-1));
 
         String imei=msgArr.get(1);
         String cmd=msgArr.get(2);
@@ -251,6 +251,10 @@ public class CoreService extends Service{
         Log.e("wzb","parseData imei="+imei+",cmd="+cmd+",info="+info);
         String rspMsg="";
         switch (cmd){
+            case Cmd.PING:
+                rspMsg = Cmd.CS + Cmd.SPLIT + imei + Cmd.SPLIT + Cmd.PING;
+                Cmd.send(rspMsg);
+                break;
             case "SOS1":
                 break;
             case Cmd.CR://test
