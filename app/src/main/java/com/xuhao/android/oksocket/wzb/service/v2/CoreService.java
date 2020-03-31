@@ -1,4 +1,4 @@
-package com.xuhao.android.oksocket.wzb.service;
+package com.xuhao.android.oksocket.wzb.service.v2;
 
 
 import android.app.AlarmManager;
@@ -11,7 +11,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,14 +26,11 @@ import com.xuhao.android.libsocket.sdk.protocol.IHeaderProtocol;
 import com.xuhao.android.libsocket.utils.BytesUtils;
 import com.xuhao.android.oksocket.MyApplication;
 import com.xuhao.android.oksocket.wzb.action.AlertAction;
-import com.xuhao.android.oksocket.wzb.action.FindAction;
 import com.xuhao.android.oksocket.wzb.action.HrAction;
 import com.xuhao.android.oksocket.wzb.action.IpAction;
-import com.xuhao.android.oksocket.wzb.action.VernoAction;
-import com.xuhao.android.oksocket.wzb.action.WeatherAction;
+import com.xuhao.android.oksocket.wzb.action.v2.InitAction;
 import com.xuhao.android.oksocket.wzb.camera.CameraService;
-import com.xuhao.android.oksocket.wzb.receiver.LkAlarmReceiver;
-import com.xuhao.android.oksocket.wzb.receiver.ReConnectAlarmReceiver;
+import com.xuhao.android.oksocket.wzb.receiver.v2.ReConnectAlarmReceiver;
 import com.xuhao.android.oksocket.wzb.util.Cmd;
 import com.xuhao.android.oksocket.wzb.util.LogUtil;
 
@@ -47,9 +43,11 @@ import static android.widget.Toast.LENGTH_SHORT;
 import static com.xuhao.android.libsocket.sdk.OkSocket.open;
 
 /**
- * @author wzb<wangzhibin_x@qq.com>
- * @date 2018-07-02	16:43
- */
+*
+* @Author: Zhibin Wang
+* @Email: wangzhibin_x@qq.com
+* @Time: 2020/3/31 15:12
+*/
 public class CoreService extends Service{
 
     private ConnectionInfo mInfo;
@@ -64,8 +62,9 @@ public class CoreService extends Service{
         @Override
         public void onSocketConnectionSuccess(Context context, ConnectionInfo info, String action) {
             Log.e("wzb","onSocketConnectionSuccess ");
-            context.startService(new Intent(context,LkLongRunningService.class));
-            context.startService(new Intent(context,UdLongRunningService.class));
+            //context.startService(new Intent(context, LkLongRunningService.class));
+            //context.startService(new Intent(context, UdLongRunningService.class));
+            InitAction.upload();
         }
 
         @Override
@@ -88,10 +87,12 @@ public class CoreService extends Service{
         @Override
         public void onSocketReadResponse(Context context, ConnectionInfo info, String action, OriginalData data) {
             super.onSocketReadResponse(context, info, action, data);
-            String str = new String(data.getBodyBytes(), Charset.forName("utf-8"));
+            String strHead=new String(data.getHeadBytes(), Charset.forName("utf-8"));
+            String downNum=strHead.substring(4,7);
+            String strBody = new String(data.getBodyBytes(), Charset.forName("utf-8"));
             //logRece(str);
-            Log.e("wzb","CoreService/onSocketReadResponse rece:"+str);
-            parseData(str);
+            Log.e("wzb","CoreService/onSocketReadResponse rece:"+strBody);
+            parseData(downNum,strBody);
             Log.e("wzb","parseData end");
         }
 
@@ -121,9 +122,7 @@ public class CoreService extends Service{
 
         @Override
         public int getBodyLength(byte[] header, ByteOrder byteOrder) {
-           // String headerStr=new String(header);
-           // LogUtil.logMessage("wzb","v1A headerStr="+headerStr);
-           // LogUtil.logMessage("wzb","v1A BytesUtils.bytesToHexString="+BytesUtils.bytesToHexString(header));
+
             String hexHeaderStr= BytesUtils.convertHexToString(BytesUtils.bytesToHexString(header));
             return Integer.valueOf(hexHeaderStr,16);
 
@@ -133,22 +132,26 @@ public class CoreService extends Service{
 
     IHeaderProtocol mIHeaderProtocolB=new IHeaderProtocol(){
         //协议B 包头有其他内容，开始标识aa+包长， 包尾有结束标识aa.仅举例，aa可换其他字符
+        //@B#@002*000002*80@E#@
+        //包头(4位)+编号(3位)+内容长度(6位)+内容+包尾(4位)
         @Override
         public int getHeaderLength() {
-            return 6;
+            return 15;
 
         }
 
         @Override
         public int getBodyLength(byte[] header, ByteOrder byteOrder) {
             String headerStr=new String(header);
-            LogUtil.logMessage("wzb","v1 headerStr="+headerStr);
-            if(!"aa".equals(headerStr.substring(0,2))){
+            LogUtil.logMessage("wzb","headerStr="+headerStr+" length="+headerStr.length());
+
+            if(!Cmd.DATA_START.equals(headerStr.substring(0,4))){
                 return 0; //如果包头标识不符合，返回0即可丢弃此次错误数据
              }
-            LogUtil.logMessage("wzb","headerStr="+headerStr);
+            String hexBodyLen=headerStr.substring(8,14);
+            LogUtil.logMessage("wzb","hexBodyLen="+hexBodyLen);
 
-            return Integer.valueOf(headerStr.substring(2),16)+2;
+            return Integer.valueOf(hexBodyLen,16)+4;
 
         }
     };
@@ -187,8 +190,8 @@ public class CoreService extends Service{
     }
 
     public static void connect(){
-        if(mManager == null){
-            LogUtil.logMessage("wzb","connect: mManager is null");
+        if(mManager == null) {
+            LogUtil.logMessage("wzb","v2 connect : mManager is null");
             return;
         }
         if(!mManager.isConnect()) mManager.connect();
@@ -241,58 +244,32 @@ public class CoreService extends Service{
                     break;
 
                 default:
+
                     break;
             }
         }
     };
 
-    private void parseData(String msg){
-        List<String> msgArr= Arrays.asList(msg.split("\\*|,",-1));
+    private void parseData(String downNum,String msg){
+        List<String> msgArr= Arrays.asList(msg.split("\\*|,|;",-1));
 
-        String imei=msgArr.get(1);
-        String cmd=msgArr.get(2);
-       // String info=msgArr.get(3).substring(cmd.length()+1);
-        String info="";
-       if(msgArr.size()>3) info=msg.substring(Cmd.DATA_CMD_HEADER_LEN+cmd.length()+1);
-        Log.e("wzb","parseData imei="+imei+",cmd="+cmd+",info="+info);
-        String rspMsg="";
-        switch (cmd){
-            case Cmd.PING:
-                rspMsg = Cmd.CS + Cmd.SPLIT + imei + Cmd.SPLIT + Cmd.PING;
-                Cmd.send(rspMsg);
-                break;
-            case "SOS1":
-                break;
-            case Cmd.CR://test
-                //HrAction.upload();
-               // FindAction.execute(mContext);
-                AlertAction.execute(mContext,"warning test!");
-                break;
-            case Cmd.PHOTO:
-                startService(new Intent(MyApplication.CONTEXT, CameraService.class));
-                break;
-            case Cmd.UPLOAD:
-                if(msgArr.size()>3) {
-                    int udInterval = Integer.parseInt(msgArr.get(3));
-                    if(udInterval>=10 && udInterval<12*3600) {
-                        MyApplication.sp.set("upload", udInterval);
-                        rspMsg = Cmd.CS + Cmd.SPLIT + imei + Cmd.SPLIT + "UPLOAD";
-                        Cmd.send(rspMsg);
-                        Intent i = new Intent(MyApplication.CONTEXT, UdLongRunningService.class);
-                        MyApplication.CONTEXT.startService(i);
-                    }
+        switch(downNum){
+            case Cmd.SERVER_ACK_NUM:
+            {
+                String reNum=msgArr.get(0);
+                switch (reNum){
+                    case Cmd.INIT_NUM:
+                        InitAction.ack(mContext,null);
+                        break;
+                    default:
+                        break;
                 }
-                break;
-            case Cmd.HR:
-                mCoreServiceHandler.removeCallbacks(HrAction.hrTimeOut);
-                break;
-            case Cmd.IP:
-                if(IpAction.execute(mContext,info)==0){
-                    reconnectNewIp();
-                }
-                break;
+            }
+            break;
             default:
                 break;
         }
+
+
     }
 }

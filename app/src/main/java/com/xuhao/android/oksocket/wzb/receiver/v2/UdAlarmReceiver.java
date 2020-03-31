@@ -1,10 +1,10 @@
-package com.xuhao.android.oksocket.wzb.receiver;
+package com.xuhao.android.oksocket.wzb.receiver.v2;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.xuhao.android.oksocket.wzb.service.UdLongRunningService;
+import com.xuhao.android.oksocket.wzb.service.v2.UdLongRunningService;
 
 /**
  * Created by Administrator on 2018-07-10.

@@ -5,6 +5,8 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -48,6 +50,27 @@ public class Cmd {
 
     public static final int DATA_CMD_HEADER_LEN=2+1+15+1;
 
+
+    //cmd number
+    public static final String DATA_START="@B#@";
+    public static final String DATA_END="@E#@";
+    //up cmd
+    public static final String LK_NUM="003";
+    public static final String INIT_NUM="001";
+    public static final String SYNC_NUM="002";
+    public static final String WEATHER_NUM="004";
+    public static final String UD_NUM="005";
+    public static final String AL_NUM="006";
+    public static final String BAT_NUM="007";
+
+    //down cmd
+    public static final String SERVER_ACK_NUM="100";
+    public static final String IP_NUM="101";
+    public static final String FAMILY_PHONE_NUM="102";
+    public static final String CONFIG_NUM="103";
+    public static final String CONTROL_NUM="104";
+
+
     public static final String LK="LK";
     public static final String CS="CS";
     public static final String UD="UD";
@@ -86,9 +109,19 @@ public class Cmd {
 
 
     public static final String IMEI=getImei();
+    public static final String IMSI=getImsi();
+    public static final String PHONENUMBER=getPhoneNum();
+    public static final int OPTYPE=getOperatorType();
+    public static final String DEVICE_MODEL="ZC01";
+    public static final String SW_VERSION=getProperty("ro.hardware","unknow");
 
     public static String encode(String data){
         return String.format("%04x",data.length())+data;
+    }
+
+    public static String encode2(String cmdNum,String data){
+
+        return DATA_START+cmdNum+"*"+IMEI+"*"+String.format("%06x",data.length())+"*"+data+DATA_END;
     }
 
     public static String decode(String data){
@@ -98,7 +131,7 @@ public class Cmd {
 
     public static String getImei() {
         String defaultImei="123456789012346";
-        TelephonyManager telephonyManager = (TelephonyManager) MyApplication.CONTEXT.getSystemService(MyApplication.CONTEXT.TELEPHONY_SERVICE);
+        TelephonyManager telephonyManager = (TelephonyManager) MyApplication.CONTEXT.getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(MyApplication.CONTEXT, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -114,18 +147,93 @@ public class Cmd {
         return imei!=null? imei:defaultImei;
     }
 
+    public static String getImsi(){
+        TelephonyManager mTelephonyMgr = (TelephonyManager) MyApplication.CONTEXT.getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(MyApplication.CONTEXT, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return "";
+        }
+        String imsi = mTelephonyMgr.getSubscriberId()!=null? mTelephonyMgr.getSubscriberId():"";
+
+        return imsi ;
+
+
+    }
+
+    public static String getPhoneNum(){
+        TelephonyManager mTelephonyMgr = (TelephonyManager) MyApplication.CONTEXT.getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(MyApplication.CONTEXT, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return "";
+        }
+        String phone = mTelephonyMgr.getLine1Number()!=null? mTelephonyMgr.getLine1Number():"";
+
+        return phone ;
+
+    }
+
+
+    //1 移动;2 联通;3 电信
+    public static int getOperatorType(){
+        int operType=0;
+        TelephonyManager mTelephonyMgr = (TelephonyManager) MyApplication.CONTEXT.getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(MyApplication.CONTEXT, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return 0;
+        }
+        String type=mTelephonyMgr.getNetworkOperator();
+        if (type.equals("46000") || type.equals("46002")) {
+            operType=1;//中国移动
+        } else if(type.equals("46001")) {
+            operType = 2;//中国联通
+        } else if (type.equals("46003")) {
+            operType = 3;//中国电信
+        }
+
+        return operType;
+    }
+
 
     public static int getBatteryLevel(){
-        BatteryManager manager=(BatteryManager)MyApplication.CONTEXT.getSystemService(Context.BATTERY_SERVICE);
+        //BatteryManager manager=(BatteryManager)MyApplication.CONTEXT.getSystemService(Context.BATTERY_SERVICE);
         int level= 0;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            level = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-        }
+        //if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        //    level = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+        //}else{
+            Intent intent = MyApplication.CONTEXT.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            LogUtil.logMessage("wzb","getBatteryLevel intent="+intent);
+            if(intent != null){
+                level = intent.getIntExtra("level", 0);
+            }
+
+        //}
         return level;
     }
 
     public static void send(String msg){
         CoreService.mManager.send(new MsgDataBean(encode(msg)));
+    }
+
+    public static void send2(String cmdNum,String msg){
+        CoreService.mManager.send(new MsgDataBean(encode2(cmdNum,msg)));
     }
 
     public static String getProperty(String key, String defaultValue) {

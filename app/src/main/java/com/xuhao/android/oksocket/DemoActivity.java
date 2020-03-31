@@ -13,13 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.xuhao.android.oksocket.wzb.action.PhbAction;
-import com.xuhao.android.oksocket.wzb.camera.CameraService;
 import com.xuhao.android.oksocket.wzb.camera.CameraWindow;
-import com.xuhao.android.oksocket.wzb.service.LkLongRunningService;
-import com.xuhao.android.oksocket.wzb.service.UdLongRunningService;
 import com.xuhao.android.oksocket.wzb.util.Cmd;
-import com.xuhao.android.oksocket.wzb.service.CoreService;
+import com.xuhao.android.oksocket.wzb.service.v2.CoreService;
 import com.xuhao.android.oksocket.wzb.util.PermissionUtils;
 
 /**

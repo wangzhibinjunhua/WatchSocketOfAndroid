@@ -1,22 +1,17 @@
-package com.xuhao.android.oksocket.wzb.service;
+package com.xuhao.android.oksocket.wzb.service.v2;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.location.Location;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.xuhao.android.oksocket.DemoActivity;
-import com.xuhao.android.oksocket.MyApplication;
 import com.xuhao.android.oksocket.data.MsgDataBean;
+import com.xuhao.android.oksocket.wzb.receiver.v2.LkAlarmReceiver;
 import com.xuhao.android.oksocket.wzb.util.Cmd;
-import com.xuhao.android.oksocket.wzb.receiver.LkAlarmReceiver;
-import com.xuhao.android.oksocket.wzb.util.LocationUtils;
 
 import java.util.Date;
 
@@ -57,7 +52,7 @@ public class LkLongRunningService extends Service {
         manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
         //test
         //String info= LocationUtils.getInstance(MyApplication.CONTEXT).getLocation();
-        //Log.e("wzb","bat info="+Cmd.getBatteryLevel());
+        //Log.e("wzb","location info="+info);
         //Toast.makeText(MyApplication.CONTEXT,info,Toast.LENGTH_LONG).show();
     }
 

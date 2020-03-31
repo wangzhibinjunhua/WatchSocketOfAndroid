@@ -62,6 +62,20 @@
         <receiver android:name=".wzb.receiver.ReConnectAlarmReceiver"/>
         <receiver android:name=".wzb.receiver.UdAlarmReceiver"/>
 
+        <service android:name=".wzb.service.v2.CoreService"
+            android:exported="true"/>
+        <service android:name=".wzb.service.v2.LkLongRunningService"/>
+        <service android:name=".wzb.service.v2.UdLongRunningService"/>
+        <receiver android:name=".wzb.receiver.v2.LkAlarmReceiver" />
+        <receiver android:name=".wzb.receiver.v2.CommonReceiver">
+            <intent-filter>
+                <action android:name="com.android.custom.v2_oksocket_reboot"/>
+                <action android:name="com.android.cutom.v2_tracker_sos"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".wzb.receiver.v2.ReConnectAlarmReceiver"/>
+        <receiver android:name=".wzb.receiver.v2.UdAlarmReceiver"/>
+
         <service android:name=".wzb.camera.CameraService"/>
     </application>
 
