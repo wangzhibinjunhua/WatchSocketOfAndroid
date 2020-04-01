@@ -40,7 +40,7 @@ public class LkLongRunningService extends Service {
             @Override
             public void run() {
                 Log.e("wzb","LkLongRunningService executed at "+new Date().toString());
-                String msg= Cmd.encode(Cmd.CS+Cmd.SPLIT+Cmd.IMEI+Cmd.SPLIT+Cmd.LK);
+                String msg= Cmd.encode2(Cmd.LK_NUM,Cmd.getBatteryLevel(true));
                 CoreService.mManager.send(new MsgDataBean(msg));
             }
         }).start();
@@ -50,10 +50,7 @@ public class LkLongRunningService extends Service {
         Intent i = new Intent(this, LkAlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
         manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
-        //test
-        //String info= LocationUtils.getInstance(MyApplication.CONTEXT).getLocation();
-        //Log.e("wzb","location info="+info);
-        //Toast.makeText(MyApplication.CONTEXT,info,Toast.LENGTH_LONG).show();
+
     }
 
 

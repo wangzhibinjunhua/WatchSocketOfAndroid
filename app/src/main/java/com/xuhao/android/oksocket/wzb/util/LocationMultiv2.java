@@ -14,7 +14,10 @@ import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoGsm;
+import android.telephony.CellInfoWcdma;
+import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
+import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 
 import com.xuhao.android.oksocket.MyApplication;
@@ -138,7 +141,7 @@ public class LocationMultiv2 {
             Log.e("wzb","no PROVIDER");
         }
         locationManager.requestLocationUpdates(provider, 1000, 0, locationListener);
-        mHandler.postDelayed(gpsTimeOut,10*1000);
+        mHandler.postDelayed(gpsTimeOut,12*1000);
         LogUtil.logMessage("wzb","StartLocation -");
     }
 
@@ -158,6 +161,7 @@ public class LocationMultiv2 {
     private List<ScanResult> getWifiList() {
         WifiManager wifiManager = (WifiManager) MyApplication.CONTEXT.getSystemService(WIFI_SERVICE);
         List<ScanResult> scanWifiList = wifiManager.getScanResults();
+        Log.e("wzb","scanWifiList size="+scanWifiList.size());
         List<ScanResult> wifiList = new ArrayList<>();
         if (scanWifiList != null && scanWifiList.size() > 0) {
             HashMap<String, Integer> signalStrength = new HashMap<String, Integer>();
@@ -194,6 +198,104 @@ public class LocationMultiv2 {
         return wifiInfo;
     }
 
+//android6.0
+public String getCellInfoNew(){
+    String cellInfo="";
+    LogUtil.logMessage("wzb","getCellInfo +");
+    TelephonyManager tm=(TelephonyManager) MyApplication.CONTEXT.getSystemService(Context.TELEPHONY_SERVICE);
+
+    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // TODO: Consider calling
+        //    ActivityCompat#requestPermissions
+        // here to request the missing permissions, and then overriding
+        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+        //                                          int[] grantResults)
+        // to handle the case where the user grants the permission. See the documentation
+        // for ActivityCompat#requestPermissions for more details.
+        Log.e("wzb","location no permission");
+        return "0;";
+
+    }
+    try {
+        List<CellInfo> infoLists=tm.getAllCellInfo();
+        if (infoLists.size() < 1) {
+            String stationNum = "0";
+            cellInfo += stationNum;
+            cellInfo += ";";
+
+
+        } else {
+            String stationNum = "" + (infoLists.size() > 5 ? 5 : infoLists.size());
+            cellInfo += stationNum;
+            cellInfo += ",";
+
+            String gsmDelay = "1";
+            cellInfo += gsmDelay;
+            cellInfo += ",";
+
+            String mcc = "460";
+            cellInfo += mcc;
+            cellInfo += ",";
+
+            String mnc="00";
+            if(infoLists.get(0).toString().contains("CellInfoWcdma")){
+                CellInfoWcdma cw=(CellInfoWcdma)infoLists.get(0);
+                mnc=""+cw.getCellIdentity().getMnc();
+            }else {
+                CellInfoGsm cg = (CellInfoGsm) infoLists.get(0);
+                mnc = "" + cg.getCellIdentity().getMnc();
+            }
+
+            cellInfo += mnc;
+            cellInfo += ",";
+            for (int i = 0; i < (infoLists.size() > 5 ? 5 : infoLists.size()); i++) {
+               if(infoLists.get(i).toString().contains("CellInfoWcdma")){
+                   CellInfoWcdma cg2 = (CellInfoWcdma) infoLists.get(i);
+                   String lac = "" + cg2.getCellIdentity().getLac();//基站位置区域码
+                   cellInfo += lac;
+                   cellInfo += ",";
+
+                   String cellid = "" + cg2.getCellIdentity().getCid();//基站编号
+                   cellInfo += cellid;
+                   cellInfo += ",";
+
+                   String stationDbm = "" + cg2.getCellSignalStrength().getDbm();
+                   cellInfo += stationDbm;
+                   cellInfo += ",";
+               }else {
+
+                   CellInfoGsm cg2 = (CellInfoGsm) infoLists.get(i);
+                   String lac = "" + cg2.getCellIdentity().getLac();//基站位置区域码
+                   cellInfo += lac;
+                   cellInfo += ",";
+
+                   String cellid = "" + cg2.getCellIdentity().getCid();//基站编号
+                   cellInfo += cellid;
+                   cellInfo += ",";
+
+                   String stationDbm = "" + cg2.getCellSignalStrength().getDbm();
+                   cellInfo += stationDbm;
+                   cellInfo += ",";
+               }
+
+            }
+        }
+    }catch(Exception e){
+        LogUtil.logMessage("wzb","getCellInfo exception e:"+e.toString());
+        cellInfo += 0;
+        cellInfo += ";";
+
+    }
+    cellInfo=cellInfo.substring(0,cellInfo.length()-1);
+    cellInfo+=";";
+
+    LogUtil.logMessage("wzb","cellInfo="+cellInfo);
+    LogUtil.logMessage("wzb","getCellInfo -");
+    return cellInfo;
+}
+
+
+    //android10.0 此函数获取基站信息ok;6.0上不行
     public String getCellInfo(){
         String cellInfo="";
         LogUtil.logMessage("wzb","getCellInfo +");
@@ -208,7 +310,7 @@ public class LocationMultiv2 {
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             Log.e("wzb","location no permission");
-            return "0,";
+            return "0;";
 
         }
         try {
@@ -256,10 +358,12 @@ public class LocationMultiv2 {
         }catch(Exception e){
             LogUtil.logMessage("wzb","getCellInfo exception e:"+e.toString());
             cellInfo += 0;
-            cellInfo += ",";
+            cellInfo += ";";
 
         }
 
+        cellInfo=cellInfo.substring(0,cellInfo.length()-1);
+        cellInfo+=";";
         LogUtil.logMessage("wzb","cellInfo="+cellInfo);
         LogUtil.logMessage("wzb","getCellInfo -");
         return cellInfo;
@@ -298,14 +402,14 @@ public class LocationMultiv2 {
         String dateYear=String.format("%04d",now.get(Calendar.YEAR));
         String dateMonth=String.format("%02d",now.get(Calendar.MONTH)+1);
         String dateDay=String.format("%02d",now.get(Calendar.DAY_OF_MONTH));
-        String date=dateDay+dateMonth+dateYear.substring(2);
+        String date=dateYear+dateMonth+dateDay;
         String time=String.format("%02d",now.get(Calendar.HOUR_OF_DAY))+String.format("%02d",now.get(Calendar.MINUTE))
                 +String.format("%02d",now.get(Calendar.SECOND));
         Log.e("wzb","date="+date+" time="+time);
         info+=date;
-        info+=",";
+
         info+=time;
-        info+=",";
+        info+=";";
 
         String gpsStatus="A";
         info+=gpsStatus;
@@ -345,23 +449,8 @@ public class LocationMultiv2 {
 
         String gsmDbm="0";
         info+=gsmDbm;
-        info+=",";
+        info+=";";
 
-        String batteryLevel=Cmd.getBatteryLevel(false);
-        info+=batteryLevel;
-        info+=",";
-
-        String stepCounter="0";
-        info+=stepCounter;
-        info+=",";
-
-        //String rollNum="0";
-        //info+=rollNum;
-        //info+=",";
-
-        String deviceStatus="00000000";
-        info+=deviceStatus;
-        info+=",";
 
         String stationNum="0";
         info+=stationNum;
@@ -389,7 +478,7 @@ public class LocationMultiv2 {
 
         String stationDbm="0";
         info+=stationDbm;
-        info+=",";
+        info+=";";
 
         String wifiNum="0";
         info+=wifiNum;
@@ -400,7 +489,7 @@ public class LocationMultiv2 {
                 @Override
                 public void run() {
 
-                    String msg= Cmd.encode(Cmd.CS+Cmd.SPLIT+Cmd.IMEI+Cmd.SPLIT+Cmd.UD+","+udInfo);
+                    String msg= Cmd.encode2(Cmd.UD_NUM,udInfo);
                     CoreService.mManager.send(new MsgDataBean(msg));
                 }
             }).start();
@@ -415,14 +504,14 @@ public class LocationMultiv2 {
         String dateYear=String.format("%04d",now.get(Calendar.YEAR));
         String dateMonth=String.format("%02d",now.get(Calendar.MONTH)+1);
         String dateDay=String.format("%02d",now.get(Calendar.DAY_OF_MONTH));
-        String date=dateDay+dateMonth+dateYear.substring(2);
+        String date=dateYear+dateMonth+dateDay;
         String time=String.format("%02d",now.get(Calendar.HOUR_OF_DAY))+String.format("%02d",now.get(Calendar.MINUTE))
                 +String.format("%02d",now.get(Calendar.SECOND));
         Log.e("wzb","date="+date+" time="+time);
         info+=date;
-        info+=",";
+
         info+=time;
-        info+=",";
+        info+=";";
 
         String gpsStatus="V";
         info+=gpsStatus;
@@ -462,27 +551,10 @@ public class LocationMultiv2 {
 
         String gsmDbm="0";
         info+=gsmDbm;
-        info+=",";
-
-        String batteryLevel=Cmd.getBatteryLevel(false);
-        info+=batteryLevel;
-        info+=",";
-
-        String stepCounter="0";
-        info+=stepCounter;
-        info+=",";
-
-        //String rollNum="0";
-        //info+=rollNum;
-        //info+=",";
-
-        String deviceStatus="00000000";
-        info+=deviceStatus;
-        info+=",";
+        info+=";";
 
 
-
-        info+=getCellInfo();
+        info+=getCellInfoNew();
 
 
         info+=getWifiInfo();
@@ -493,7 +565,7 @@ public class LocationMultiv2 {
             @Override
             public void run() {
 
-                String msg= Cmd.encode(Cmd.CS+Cmd.SPLIT+Cmd.IMEI+Cmd.SPLIT+Cmd.UD+","+udInfo);
+                String msg= Cmd.encode2(Cmd.UD_NUM,udInfo);
                 CoreService.mManager.send(new MsgDataBean(msg));
             }
         }).start();

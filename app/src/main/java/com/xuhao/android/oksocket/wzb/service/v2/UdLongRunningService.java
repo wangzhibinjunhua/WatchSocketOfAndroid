@@ -51,7 +51,7 @@ public class UdLongRunningService extends Service {
                         Settings.Secure
                                 .getUriFor(Settings.System.LOCATION_PROVIDERS_ALLOWED),
                         false, mGpsMonitor);
-       // openGPS(true);
+        openGPS(true);
     }
 
     private final ContentObserver mGpsMonitor=new ContentObserver(null) {

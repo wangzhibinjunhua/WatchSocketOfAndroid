@@ -52,7 +52,7 @@ public class DemoActivity extends AppCompatActivity {
         });
         initPermission();
         dialogOpenPower();
-        CameraWindow.show(MyApplication.CONTEXT);
+       // CameraWindow.show(MyApplication.CONTEXT);
         test();
     }
 
