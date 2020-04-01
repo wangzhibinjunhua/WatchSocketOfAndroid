@@ -177,7 +177,7 @@ public class UdLongRunningService extends Service {
         info+=gsmDbm;
         info+=",";
 
-        String batteryLevel=String.valueOf(Cmd.getBatteryLevel());
+        String batteryLevel=Cmd.getBatteryLevel(false);
         info+=batteryLevel;
         info+=",";
 

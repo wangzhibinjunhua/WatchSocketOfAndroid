@@ -27,7 +27,7 @@ public class InitAction {
 
     public static void ack(Context context,String msg){
        context.startService(new Intent(context, LkLongRunningService.class));
-       //context.startService(new Intent(context, UdLongRunningService.class));
+       context.startService(new Intent(context, UdLongRunningService.class));
     }
 
     private static String packInitInfo(){
@@ -42,7 +42,7 @@ public class InitAction {
         info+=",";
         info+=Cmd.SW_VERSION;
         info+=",";
-        info+=Cmd.getBatteryLevel();
+        info+=Cmd.getBatteryLevel(false);
         return info;
     }
 }

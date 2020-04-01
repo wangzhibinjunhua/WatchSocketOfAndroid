@@ -198,9 +198,21 @@ public class LocationMultiv2 {
         String cellInfo="";
         LogUtil.logMessage("wzb","getCellInfo +");
         TelephonyManager tm=(TelephonyManager) MyApplication.CONTEXT.getSystemService(Context.TELEPHONY_SERVICE);
-        List<CellInfo> infoLists=tm.getAllCellInfo();
 
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Log.e("wzb","location no permission");
+            return "0,";
+
+        }
         try {
+            List<CellInfo> infoLists=tm.getAllCellInfo();
             if (infoLists.size() < 1) {
                 String stationNum = "0";
                 cellInfo += stationNum;
@@ -335,7 +347,7 @@ public class LocationMultiv2 {
         info+=gsmDbm;
         info+=",";
 
-        String batteryLevel=String.valueOf(Cmd.getBatteryLevel());
+        String batteryLevel=Cmd.getBatteryLevel(false);
         info+=batteryLevel;
         info+=",";
 
@@ -452,7 +464,7 @@ public class LocationMultiv2 {
         info+=gsmDbm;
         info+=",";
 
-        String batteryLevel=String.valueOf(Cmd.getBatteryLevel());
+        String batteryLevel=Cmd.getBatteryLevel(false);
         info+=batteryLevel;
         info+=",";
 

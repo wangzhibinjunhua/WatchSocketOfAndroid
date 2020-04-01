@@ -212,20 +212,35 @@ public class Cmd {
     }
 
 
-    public static int getBatteryLevel(){
+    public static String getBatteryLevel(boolean hasChargStatus){
         //BatteryManager manager=(BatteryManager)MyApplication.CONTEXT.getSystemService(Context.BATTERY_SERVICE);
         int level= 0;
+        int chargStatus=0;
         //if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
         //    level = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
         //}else{
             Intent intent = MyApplication.CONTEXT.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-            LogUtil.logMessage("wzb","getBatteryLevel intent="+intent);
+            //LogUtil.logMessage("wzb","getBatteryLevel intent="+intent);
             if(intent != null){
                 level = intent.getIntExtra("level", 0);
+                int status=intent.getIntExtra("status",BatteryManager.BATTERY_STATUS_UNKNOWN);
+                if(status==BatteryManager.BATTERY_STATUS_CHARGING) {
+                    chargStatus=1;
+                }
+                else {
+                    chargStatus=0;
+                }
+
             }
 
         //}
-        return level;
+
+        if(hasChargStatus){
+            return ""+level+","+chargStatus;
+        }
+        return ""+level;
+
+
     }
 
     public static void send(String msg){

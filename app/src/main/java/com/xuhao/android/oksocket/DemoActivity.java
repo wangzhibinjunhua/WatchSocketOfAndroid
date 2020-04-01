@@ -66,6 +66,7 @@ public class DemoActivity extends AppCompatActivity {
     }
 
     void test(){
+        //Log.e("wzb","battery info:"+Cmd.getBatteryLevel(true));
         String imei= Cmd.IMEI;
         Log.e("wzb","test imei="+imei);
         startService(new Intent(this, CoreService.class));
