@@ -30,7 +30,7 @@ import java.util.List;
 
 public class UdLongRunningService extends Service {
 
-    public static final int UD_INTERVAL=20;//20 seconds//20*1000;//60 seconds
+    public static final int UD_INTERVAL=40;//20 seconds//20*1000;//60 seconds
 
     private LocationManager mLocationManager;
     private Context mContext;

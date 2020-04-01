@@ -141,7 +141,7 @@ public class LocationMultiv2 {
             Log.e("wzb","no PROVIDER");
         }
         locationManager.requestLocationUpdates(provider, 1000, 0, locationListener);
-        mHandler.postDelayed(gpsTimeOut,12*1000);
+        mHandler.postDelayed(gpsTimeOut,20*1000);
         LogUtil.logMessage("wzb","StartLocation -");
     }
 
