@@ -107,7 +107,8 @@ public class UdLongRunningService extends Service {
         LocationMultiv2.getInstance(MyApplication.CONTEXT).StartLocation();
 
         AlarmManager manager=(AlarmManager)getSystemService(ALARM_SERVICE);
-        int dynamicUDInterval=MyApplication.sp.get("upload",UD_INTERVAL);
+        //int dynamicUDInterval=MyApplication.sp.get("upload",UD_INTERVAL);
+        int dynamicUDInterval=Cmd.getUdIntervalMin()*60;//seconds
         LogUtil.logMessage("wzb","dynamicUDInterval="+dynamicUDInterval);
         long triggerAtTime= SystemClock.elapsedRealtime() + dynamicUDInterval*1000;
         Intent i = new Intent(this, UdAlarmReceiver.class);

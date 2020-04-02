@@ -340,7 +340,39 @@ public class Cmd {
 
     }
 
+    public static String getFamilyPhoneNumChecksum(){
+        return MyApplication.sp.get("family_cs","");
+    }
 
 
+    //0:铃声+震动;1:仅震动;2:仅铃声;3:无震无声
+    public static String getSoundSettings(){
+        return MyApplication.sp.get("sound_settings","2");
+    }
+
+    public static int getUdIntervalMin(){
+       return MyApplication.sp.get("upload",60);
+    }
+
+    public static int getPedoIntervalMin(){
+        return MyApplication.sp.get("pedo",60);
+    }
+
+    public static int getLowBatLevel(){
+        return MyApplication.sp.get("lowbat",15);
+    }
+
+
+    public static int getTrackOn(){
+        return MyApplication.sp.get("track_on",0);
+    }
+
+    public static int getPedoOn(){
+        return MyApplication.sp.get("pedo_on",0);
+    }
+
+    public static int getGpsOn(){
+        return MyApplication.sp.get("gps_on",0);
+    }
 
 }
