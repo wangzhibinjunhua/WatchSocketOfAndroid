@@ -29,6 +29,11 @@ public class InitAction {
        context.startService(new Intent(context, LkLongRunningService.class));
        context.startService(new Intent(context, UdLongRunningService.class));
        ConfigSyncAction.upload();
+
+       //below is test
+       ALAction.upload();
+       WeatherAction.upload();
+       //test end
     }
 
     private static String packInitInfo(){

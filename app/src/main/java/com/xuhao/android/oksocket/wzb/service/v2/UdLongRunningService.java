@@ -104,7 +104,7 @@ public class UdLongRunningService extends Service {
         //    }
         //}).start();
 
-        LocationMultiv2.getInstance(MyApplication.CONTEXT).StartLocation();
+        LocationMultiv2.getInstance(MyApplication.CONTEXT).StartLocation(0);
 
         AlarmManager manager=(AlarmManager)getSystemService(ALARM_SERVICE);
         //int dynamicUDInterval=MyApplication.sp.get("upload",UD_INTERVAL);

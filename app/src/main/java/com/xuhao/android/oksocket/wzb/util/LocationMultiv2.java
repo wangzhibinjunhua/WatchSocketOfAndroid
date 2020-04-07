@@ -61,6 +61,8 @@ public class LocationMultiv2 {
 
     private WifiManager mWifiManager;
 
+    private static int udType=0;//0:定时上报,1:指令查询
+
     private LocationMultiv2(Context context) {
         mContext = context;
     }
@@ -165,7 +167,8 @@ public class LocationMultiv2 {
         return info;
     }
 
-    public void StartLocation(){
+    public void StartLocation(int type){
+        udType=type;
         LogUtil.logMessage("wzb","StartLocation +");
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -514,7 +517,7 @@ public String getCellInfoNew(){
 
 
         LogUtil.logMessage("wzb","uploadLbsGpsData info="+info);
-        final String udInfo=info;
+        final String udInfo=udType+"*"+info;
         new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -590,7 +593,7 @@ public String getCellInfoNew(){
         info+=getWifiInfo();
 
         LogUtil.logMessage("wzb","uploadLbsWifiData info="+info);
-        final String udInfo=info;
+        final String udInfo=udType+"*"+info;
         new Thread(new Runnable() {
             @Override
             public void run() {
