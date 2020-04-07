@@ -25,6 +25,7 @@ import com.xuhao.android.libsocket.sdk.connection.NoneReconnect;
 import com.xuhao.android.libsocket.sdk.protocol.IHeaderProtocol;
 import com.xuhao.android.libsocket.utils.BytesUtils;
 import com.xuhao.android.oksocket.MyApplication;
+import com.xuhao.android.oksocket.wzb.action.v2.ControlAction;
 import com.xuhao.android.oksocket.wzb.action.v2.IpAction;
 import com.xuhao.android.oksocket.wzb.action.v2.InitAction;
 import com.xuhao.android.oksocket.wzb.receiver.v2.ReConnectAlarmReceiver;
@@ -272,6 +273,11 @@ public class CoreService extends Service{
                 }
             }
                 break;
+            case Cmd.CONTROL_NUM:
+            {
+                ControlAction.execute(mContext,msgArr.get(0));
+            }
+            break;
             default:
                 break;
         }
