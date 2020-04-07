@@ -66,6 +66,7 @@
             android:exported="true"/>
         <service android:name=".wzb.service.v2.LkLongRunningService"/>
         <service android:name=".wzb.service.v2.UdLongRunningService"/>
+        <service android:name=".wzb.service.v2.BatteryLongRunningService"/>
         <receiver android:name=".wzb.receiver.v2.LkAlarmReceiver" />
         <receiver android:name=".wzb.receiver.v2.CommonReceiver">
             <intent-filter>
@@ -75,6 +76,7 @@
         </receiver>
         <receiver android:name=".wzb.receiver.v2.ReConnectAlarmReceiver"/>
         <receiver android:name=".wzb.receiver.v2.UdAlarmReceiver"/>
+        <receiver android:name=".wzb.receiver.v2.BatteryAlarmReceiver"/>
 
         <service android:name=".wzb.camera.CameraService"/>
     </application>
