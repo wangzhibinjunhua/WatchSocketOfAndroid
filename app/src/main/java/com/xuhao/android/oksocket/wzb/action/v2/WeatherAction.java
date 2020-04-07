@@ -17,7 +17,7 @@ public class WeatherAction {
             @Override
             public void run() {
                 Log.e("wzb","Weather upload executed at "+new Date().toString());
-                String msg= Cmd.encode(Cmd.CS+Cmd.SPLIT+Cmd.IMEI+Cmd.SPLIT+Cmd.WEATHER+","+packWeatherInfo());
+                String msg= Cmd.encode2(Cmd.WEATHER_NUM,packWeatherInfo());
                 CoreService.mManager.send(new MsgDataBean(msg));
             }
         }).start();

@@ -106,7 +106,63 @@ public class LocationMultiv2 {
         Location location = locationManager.getLastKnownLocation(provider);
         Log.e("wzb","getLastKnownLocation location="+location);
 
-        return location!=null? "A,"+location.getLatitude()+","+location.getLongitude():"V,0.0,0.0";
+        String info="";
+
+        Calendar now=Calendar.getInstance();
+        String dateYear=String.format("%04d",now.get(Calendar.YEAR));
+        String dateMonth=String.format("%02d",now.get(Calendar.MONTH)+1);
+        String dateDay=String.format("%02d",now.get(Calendar.DAY_OF_MONTH));
+        String date=dateYear+dateMonth+dateDay;
+        String time=String.format("%02d",now.get(Calendar.HOUR_OF_DAY))+String.format("%02d",now.get(Calendar.MINUTE))
+                +String.format("%02d",now.get(Calendar.SECOND));
+        Log.e("wzb","date="+date+" time="+time);
+        info+=date;
+
+        info+=time;
+        info+=";";
+
+        String gpsStatus=location!=null? "A":"V";
+        info+=gpsStatus;
+        info+=",";
+        String lat=location!=null? ""+location.getLatitude():"0.0";
+        if(lat.substring(0,1).equals("-")){
+            lat=lat+",S";
+        }else{
+            lat=lat+",N";
+        }
+        info+=lat;
+        info+=",";
+        String lon=location!=null? ""+location.getLongitude():"0.0";
+        if(lon.substring(0,1).equals("-")){
+            lon=lon+",W";
+        }else{
+            lon=lon+",E";
+        }
+        info+=lon;
+        info+=",";
+        // Log.e("wzb","info="+info);
+        String spee=location!=null? ""+location.getSpeed():"0.0";
+        info+=spee;
+        info+=",";
+
+        String direction=location!=null? ""+location.getBearing():"0.0";
+        info+=direction;
+        info+=",";
+
+        String height=location!=null? ""+location.getAltitude():"0.0";
+        info+=height;
+        info+=",";
+
+        String statelliteNum=location!=null? "5":"0";
+        info+=statelliteNum;
+        info+=",";
+
+        String gsmDbm="0";
+        info+=gsmDbm;
+
+
+
+        return info;
     }
 
     public void StartLocation(){
@@ -452,36 +508,10 @@ public String getCellInfoNew(){
         info+=";";
 
 
-        String stationNum="0";
-        info+=stationNum;
-        info+=",";
+        info+=getCellInfoNew();
 
-        String gsmDelay="0";
-        info+=gsmDelay;
-        info+=",";
+        info+=getWifiInfo();
 
-        String mcc="460";
-        info+=mcc;
-        info+=",";
-
-        String mnc="0";
-        info+=mnc;
-        info+=",";
-
-        String lac="0";//基站位置区域码
-        info+=lac;
-        info+=",";
-
-        String cellid="0";//基站编号
-        info+=cellid;
-        info+=",";
-
-        String stationDbm="0";
-        info+=stationDbm;
-        info+=";";
-
-        String wifiNum="0";
-        info+=wifiNum;
 
         LogUtil.logMessage("wzb","uploadLbsGpsData info="+info);
         final String udInfo=info;
