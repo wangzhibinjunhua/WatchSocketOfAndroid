@@ -52,7 +52,9 @@ public class BatteryLongRunningService extends Service {
         long triggerAtTime= SystemClock.elapsedRealtime() + BATTERY_INTERVAL;
         Intent i = new Intent(this, BatteryAlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
-        manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+       // manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+        Cmd.setAlarmTime(manager,AlarmManager.ELAPSED_REALTIME_WAKEUP,triggerAtTime,pi);
+
 
     }
 

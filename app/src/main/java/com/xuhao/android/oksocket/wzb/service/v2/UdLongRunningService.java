@@ -113,7 +113,8 @@ public class UdLongRunningService extends Service {
         long triggerAtTime= SystemClock.elapsedRealtime() + dynamicUDInterval*1000;
         Intent i = new Intent(this, UdAlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
-        manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+       // manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+        Cmd.setAlarmTime(manager,AlarmManager.ELAPSED_REALTIME_WAKEUP,triggerAtTime,pi);
 
     }
 

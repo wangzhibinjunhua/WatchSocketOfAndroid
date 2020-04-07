@@ -1,6 +1,8 @@
 package com.xuhao.android.oksocket.wzb.util;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -373,6 +375,17 @@ public class Cmd {
 
     public static int getGpsOn(){
         return MyApplication.sp.get("gps_on",0);
+    }
+
+    public static void setAlarmTime(AlarmManager manager, int type, long triggerAtTime, PendingIntent pi){
+        if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.M){
+            LogUtil.logMessage("wzb","MMMMMMMMMMMMMMMM");
+            manager.setExactAndAllowWhileIdle(type,triggerAtTime,pi);
+        }else if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT){
+            manager.setExact(type,triggerAtTime,pi);
+        }else{
+            manager.set(type,triggerAtTime,pi);
+        }
     }
 
 }

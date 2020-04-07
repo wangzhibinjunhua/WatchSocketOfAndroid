@@ -49,7 +49,8 @@ public class LkLongRunningService extends Service {
         long triggerAtTime= SystemClock.elapsedRealtime() + LK_INTERVAL;
         Intent i = new Intent(this, LkAlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
-        manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+        //manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+        Cmd.setAlarmTime(manager,AlarmManager.ELAPSED_REALTIME_WAKEUP,triggerAtTime,pi);
 
     }
 
