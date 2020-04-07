@@ -25,11 +25,8 @@ import com.xuhao.android.libsocket.sdk.connection.NoneReconnect;
 import com.xuhao.android.libsocket.sdk.protocol.IHeaderProtocol;
 import com.xuhao.android.libsocket.utils.BytesUtils;
 import com.xuhao.android.oksocket.MyApplication;
-import com.xuhao.android.oksocket.wzb.action.AlertAction;
-import com.xuhao.android.oksocket.wzb.action.HrAction;
-import com.xuhao.android.oksocket.wzb.action.IpAction;
+import com.xuhao.android.oksocket.wzb.action.v2.IpAction;
 import com.xuhao.android.oksocket.wzb.action.v2.InitAction;
-import com.xuhao.android.oksocket.wzb.camera.CameraService;
 import com.xuhao.android.oksocket.wzb.receiver.v2.ReConnectAlarmReceiver;
 import com.xuhao.android.oksocket.wzb.util.Cmd;
 import com.xuhao.android.oksocket.wzb.util.LogUtil;
@@ -266,6 +263,15 @@ public class CoreService extends Service{
                 }
             }
             break;
+            case Cmd.IP_NUM:
+            {
+                if(msgArr.size()==2){
+                    if(IpAction.execute(mContext,msgArr.get(0),msgArr.get(1))==0){
+                        reconnectNewIp();
+                    }
+                }
+            }
+                break;
             default:
                 break;
         }
